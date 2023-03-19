@@ -1,0 +1,256 @@
+//Student Name: Cynthia Maroupas Student ID: 261119382
+/*
+The BurgerChef class is a runnable that continuously makes burgers and places them on the kitchen table,
+and creates combo meals with fries when ingredients are available, updating the number of available burgers, combo meals, and ingredients.
+ */
+public class BurgerChef implements Runnable {
+    private String name = "BurgerChef";
+    private int WAIT_TIME = 1000;
+    private int MAKE_TIME = 3000;
+    // shared object to synchronize access between instances of the BurgerChef class
+    public static Object burgerChefSync = new Object();
+    // A static variable to keep track of the number of burgers on the kitchen table
+    public static int availableBurgers = 0;
+
+    @Override
+    public void run() {
+        // infinite loop to keep making burgers
+        while (true) {
+            // synchronized block to ensure only one instance of the BurgerChef class can access the shared variables at a time
+            synchronized (burgerChefSync) {
+                // check if there are enough ingredients to make a combo meal
+                if (BurgerChef.availableBurgers > 1 && FriesChef.availableFries > 1) {
+                    // check if there is room on the ready table for another combo meal
+                    if (Waitress.combo < ReadyTable.limit) {
+                        // decrease the number of burgers and fries
+                        BurgerChef.availableBurgers--;
+                        FriesChef.availableFries--;
+                        // increase the number of combo meals on the ready table
+                        Waitress.combo++;
+                        // print a message indicating that a combo meal was made and placed on the ready table
+                        System.out.println("[Action] " + name + " makes "
+                                + " Burger and Fries "
+                                + "and place it on the ready table");
+
+                        // print a status update of the ingredients and combo meals
+                        System.out.println("[Status] burgers left: " + availableBurgers +
+                                ", fries left: " + FriesChef.availableFries + ", meals left: " + Waitress.combo);
+                        System.out.println("===================================================================================");
+                    }
+                }
+
+                // check if there is room on the kitchen table for another burger
+                if (availableBurgers < KitchenTable.limit) {
+                    // makes a burger
+                    try {
+                        Thread.sleep(MAKE_TIME);
+                    } catch (InterruptedException e) {
+                        // print a message if an exception occurs while sleeping
+                        e.printStackTrace();
+                    }
+                    // increase the number of burgers on the kitchen table
+                    BurgerChef.availableBurgers++;
+                    // print a message indicating that a burger was added to the kitchen table
+                    System.out.println("[Action] " + name +
+                            " add a burger on the kitchen table");
+                    // print a status update of the number of burgers on the kitchen table
+                    System.out.println("[Status] burger left: " + BurgerChef.availableBurgers);
+
+                } else {
+                    // wait if there is no room on the kitchen table for another burger
+                    try {
+                        burgerChefSync.wait(WAIT_TIME);
+
+                    } catch (InterruptedException e) {
+                        // print a message if an exception occurs while waiting
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+}
+//Student Name: Cynthia Maroupas Student ID: 261119382
+/*
+The FriesChef class is a runnable that continuously makes fries and places them on the kitchen table,
+and creates combo meals with burgers when ingredients are available, updating the number of available fries, combo meals, and ingredients.
+ */
+public class FriesChef implements Runnable {
+    private String name = "FriesChef";
+    private int WAIT_TIME = 1000;
+    private int MAKE_TIME = 2000;
+    // shared object to synchronize access between instances of the FriesChef class
+    public static Object friesChefSync = new Object();
+    // A static variable to keep track of the number of fries on the kitchen table
+    public static int availableFries = 0;
+
+    @Override
+    public void run() {
+        // infinite loop to keep making fries
+        while (true) {
+            // synchronized block to ensure only one instance of the FriesChef class can access the shared variables at a time
+            synchronized (friesChefSync) {
+                // check if there are enough ingredients to make a combo meal
+                if (FriesChef.availableFries > 1 && BurgerChef.availableBurgers > 1) {
+                    // check if there is room on the ready table for another combo meal
+                    if (Waitress.combo < ReadyTable.limit) {
+                        // decrease the number of fries and burgers
+                        FriesChef.availableFries--;
+                        BurgerChef.availableBurgers--;
+                        // increase the number of combo meals on the ready table
+                        Waitress.combo++;
+                        // print a message indicating that a combo meal was made and placed on the ready table
+                        System.out.println("[Action] " + name + " makes "
+                                + " Burger and Fries "
+                                + "and place it on the ready table");
+
+                        // print a status update of the ingredients and combo meals
+                        System.out.println("[Status] fries left: " + availableFries +
+                                ", burgers left: " + BurgerChef.availableBurgers + ", meals left: " + Waitress.combo);
+                        System.out.println("===================================================================================");
+                    }
+                }
+
+                // check if there is room on the kitchen table for another fries
+                if (availableFries < KitchenTable.limit) {
+                    // makes a fries
+                    try {
+                        Thread.sleep(MAKE_TIME);
+                    } catch (InterruptedException e) {
+                        // print a message if an exception occurs while sleeping
+                        e.printStackTrace();
+                    }
+                    // increase the number of fries on the kitchen table
+                    FriesChef.availableFries++;
+                    // print a message indicating that a fries was added to the kitchen table
+                    System.out.println("[Action] " + name +
+                            " add a fries on the kitchen table");
+                    // print a status update of the number of fries on the kitchen table
+                    System.out.println("[Status] fries left: " + FriesChef.availableFries);
+
+                } else {
+                    // wait if there is no room on the kitchen table for another fries
+                    try {
+                        friesChefSync.wait(WAIT_TIME);
+
+                    } catch (InterruptedException e) {
+                        // print a message if an exception occurs while waiting
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+}
+//Student Name: Cynthia Maroupas Student ID: 261119382
+//A work table which for chefs to place Burgers or Fries.
+//You need to handle race condition here.
+public class KitchenTable {
+
+    // Handling race condition: volatile keyword ensures that the changes made to this variable by one thread are immediately visible to other threads
+    public static volatile int limit = 10;
+
+}
+
+//Student Name: Cynthia Maroupas Student ID: 261119382
+/*This code simulates a fast-food restaurant with 1 burger chef, 1 fries chef, and 1 waitress.
+The chefs make burgers and fries, respectively, and can combine them into a combo that the waitress serves to customers.
+The kitchen table and ready table have limits, so the chefs must wait for availability. All wait times are 1 second.*/
+/*____________________________________________________________________________________________________________________*/
+public class Main {
+
+    public static void main(String[] args) {
+        Thread burgerChef = new Thread(new BurgerChef(), "Burger Chef");
+        Thread friesChef = new Thread(new FriesChef(), "Fries Chef");
+        Thread waitress = new Thread(new Waitress(), "Waitress");
+        burgerChef.start();
+        friesChef.start();
+        waitress.start();
+    }
+
+}
+
+//Student Name: Cynthia Maroupas Student ID: 261119382
+//A table which the meals are put as soon as they become ready
+//You need to handle race condition here.
+public class ReadyTable {
+
+    // Handling race condition: volatile keyword ensures that the changes made to this variable by one thread are immediately visible to other threads
+    public static volatile int limit = 3;
+}
+
+//Student Name: Cynthia Maroupas Student ID: 261119382
+/*
+The Waitress class is a runnable that continuously serves combo meals from the ready table,
+updating the number of combo meals and starting the threads for the BurgerChef and FriesChef classes.
+ */
+public class Waitress implements Runnable {
+    private String name = "Waitress";
+    private int WAIT_TIME = 1000;
+    private int SERVE_TIME = 10000; // 10 second
+
+    // Object to synchronize access between instances of the Waitress class
+    private final Object waitressSync = new Object();
+    // variable to keep track of the number of combo meals the Waitress has served
+    public static int i = 1;
+    // static variable to keep track of the number of combo meals on the ready table
+    public static int combo;
+
+    @Override
+    public void run() {
+        // infinite loop to keep serving combo meals
+        while (true) {
+            // synchronized block to ensure only one instance of the Waitress class can access the shared variables at a time
+            synchronized (waitressSync) {
+                // check if there are any combo meals on the ready table
+                if (combo > 0) {
+                    // check if the number of combo meals on the ready table is within the limit
+                    if (combo <= ReadyTable.limit) {
+                        // simulate the time taken to serve a combo meal
+                        try {
+                            Thread.sleep(SERVE_TIME);
+                        } catch (InterruptedException e) {
+                            // print a message if an exception occurs while sleeping
+                            e.printStackTrace();
+                        }
+                        // decrease the number of combo meals on the ready table
+                        combo--;
+                        // print a message indicating that a combo meal was served
+                        System.out.println("[Action] " + name +
+                                " serves a meal");
+                        // print a status update of the number of combo meals on the ready table
+                        System.out.println("[Status] meals left: " + combo--);
+                        System.out.println("-----------------------------------------------------------------------------------");
+                        // start the threads for the BurgerChef and FriesChef classes
+
+                        // An array of Runnable instances representing the BurgerChef and FriesChef classes
+                        Runnable[] chefs = {new BurgerChef(), new FriesChef()};
+
+                        // An array of strings representing the names of the threads for the chefs
+                        String[] chefNames = {"Burger Chef", "Fries Chef"};
+
+                        // Loop through the chefs array
+                        for (int i = 0; i < chefs.length; i++) {
+                            // Create a new thread for each chef and give it the name specified in the chefNames array
+                            Thread chefThread = new Thread(chefs[i], chefNames[i]);
+                            // Start the thread
+                            chefThread.start();
+                        }
+
+                    } else {
+                        // wait if there are more combo meals on the ready table than the limit
+                        try {
+                            waitressSync.wait();
+                            Thread.sleep(WAIT_TIME);
+
+                        } catch (InterruptedException e) {
+                            // print a message if an exception occurs while waiting
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
