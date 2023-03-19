@@ -1,0 +1,617 @@
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class CoffeeMakerTest {
+
+	@Test
+	void testCoffeeMaker() {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Verify that the CoffeeMaker instance was created successfully
+		assertNotNull(coffeeMaker, "Encountered an error while creating a new instance of the CoffeeMaker class.");
+	}
+
+	// Testing if the addRecipe method works by creating a method by calling it
+	@Test
+	void testAddRecipe() {
+		CoffeeMaker e = new CoffeeMaker();
+		Recipe r1 = new Recipe();
+		boolean value = e.addRecipe(r1);
+		assertEquals(true, value);
+	}
+
+	@Test
+	void testDeleteRecipe() {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Verify that removing a recipe from an empty list returns null
+		String deletedRecipeName = coffeeMaker.deleteRecipe(0);
+		assertNull(deletedRecipeName, "Removing a recipe from an empty list");
+	}
+
+	@Test
+	void testEditRecipe() throws RecipeException {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Add a new recipe with some initial values
+		Recipe recipe = new Recipe();
+		recipe.setName("Espresso");
+		recipe.setAmtCoffee("3");
+		recipe.setAmtMilk("0");
+		recipe.setAmtSugar("0");
+		recipe.setAmtChocolate("0");
+		coffeeMaker.addRecipe(recipe);
+
+		// Modify the recipe with new values
+		Recipe newRecipe = new Recipe();
+		newRecipe.setName("Cappuccino");
+		newRecipe.setAmtCoffee("2");
+		newRecipe.setAmtMilk("1");
+		newRecipe.setAmtSugar("1");
+		newRecipe.setAmtChocolate("0");
+		String editedRecipeName = coffeeMaker.editRecipe(0, newRecipe);
+
+		// Assert that the edited recipe has the correct name
+		assertEquals("Cappuccino", editedRecipeName, "The recipe name was not updated successfully.");
+	}
+
+	@Test
+	void testAddInventory() {
+		// Instantiate a new CoffeeMaker object
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Verify that adding inventory with valid values returns true
+		boolean isInventoryAdded = false;
+		try {
+			coffeeMaker.addInventory("100", "20", "30", "40");
+			isInventoryAdded = true;
+		} catch (InventoryException e) {
+			// Ignore exception
+		}
+		assertTrue(isInventoryAdded, "Failed to add inventory with valid values");
+	}
+
+	@Test
+	void testCheckInventory() {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Verify that invoking checkInventory() returns a non-null string
+		String inventoryString = coffeeMaker.checkInventory();
+		assertNotNull(inventoryString, "The checkInventory() method should return a non-null string.");
+	}
+
+	@Test
+	void testMakeCoffee() throws RecipeException {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Add inventory with arbitrary values
+		try {
+			coffeeMaker.addInventory("5", "4", "3", "2");
+		} catch (InventoryException e) {
+			// Do nothing
+		}
+
+		// Add a recipe with custom values
+		Recipe recipe = new Recipe();
+		recipe.setName("Latte");
+		recipe.setAmtCoffee("2");
+		recipe.setAmtMilk("2");
+		recipe.setAmtSugar("1");
+		recipe.setAmtChocolate("0");
+		coffeeMaker.addRecipe(recipe);
+
+		// Verify that making a recipe with sufficient inventory returns the correct
+		// change value
+		int payment = 5;
+		int change = coffeeMaker.makeCoffee(0, payment);
+		int expectedChange = payment - recipe.getPrice();
+		assertEquals(expectedChange, change, "Incorrect change value for recipe with sufficient inventory");
+	}
+
+	@Test
+	void testGetRecipes() {
+		// Create a new instance of the CoffeeMaker class
+		CoffeeMaker coffeeMaker = new CoffeeMaker();
+
+		// Verify that making a recipe with insufficient inventory returns the full
+		// payment
+		int payment = 3;
+		int change = coffeeMaker.makeCoffee(0, payment);
+		assertEquals(payment, change, "Incorrect change value for recipe with insufficient inventory");
+	}
+}
+
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class InventoryExceptionTest {
+
+	// This test case checks if an InventoryException is thrown with the correct
+	// message
+	@Test
+	void testInventoryException() {
+		InventoryException e = assertThrows(InventoryException.class, () -> {
+			throw new InventoryException("Not enough coffee in inventory"); // throwing an InventoryException with
+																			// message
+		});
+		assertEquals("InventoryException", e.getMessage()); // Checking if the correct message is thrown
+	}
+
+	// This test case checks if an InventoryException is thrown with the correct
+	// custom message
+	@Test
+	void testInventoryExceptionWithMessage() {
+		String message = "Test message";
+		InventoryException e = assertThrows(InventoryException.class, () -> {
+			throw new InventoryException(message); // throwing an InventoryException with custom message
+		});
+		assertEquals(message, e.getMessage()); // Checking if the correct custom message is thrown
+	}
+}
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class InventoryTest {
+
+	@Test
+	void testInventory() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Verify that the Inventory instance was created successfully
+		assertNotNull(inventory,
+				"Encountered an error while attempting to create a new instance of the Inventory class.");
+	}
+
+	@Test
+	void testGetChocolate() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Verify that the initial chocolate inventory is correct
+		assertEquals(15, inventory.getChocolate(), "Chocolate inventory should begin with 15 units");
+	}
+
+	@Test
+	void testSetChocolate() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Set the chocolate inventory to a new value
+		inventory.setChocolate(10);
+		// Verify that the chocolate inventory was set correctly
+		assertEquals(10, inventory.getChocolate(), "Chocolate inventory should set 10 units");
+	}
+
+	@Test
+	void testAddChocolate() throws InventoryException {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Add chocolate to the inventory
+		inventory.addChocolate("5");
+		// Verify that the chocolate inventory was increased by the correct amount
+		assertEquals(20, inventory.getChocolate(), "Chocolate inventory should add 5 units");
+	}
+
+	@Test
+	void testGetCoffee() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Verify that the initial coffee inventory is correct
+		assertEquals(15, inventory.getCoffee(), "Coffee inventory should begin with 15 units");
+	}
+
+	@Test
+	void testSetCoffee() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Set the coffee inventory to a new value
+		inventory.setCoffee(10);
+		// Verify that the coffee inventory was set correctly
+		assertEquals(10, inventory.getCoffee(), "Coffee inventory should set 10 units");
+	}
+
+	@Test
+	void testAddCoffee() throws InventoryException {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Add coffee to the inventory
+		inventory.addCoffee("5");
+		// Verify that the coffee inventory was increased by the correct amount
+		assertEquals(20, inventory.getCoffee(), "Coffee inventory should add 5 units");
+	}
+
+	@Test
+	void testGetMilk() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Verify that the initial milk inventory is correct
+		assertEquals(15, inventory.getMilk(), "Milk inventory should begin with 15 units");
+	}
+
+	@Test
+	void testSetMilk() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+		// Set the milk inventory to a new value
+		inventory.setMilk(10);
+		// Verify that the milk inventory was set correctly
+		assertEquals(10, inventory.getMilk(), "Milk inventory should set 10 units");
+	}
+
+	// Test adding milk to inventory and checking if the inventory is updated
+	// correctly
+	@Test
+	void testAddMilk() throws InventoryException {
+		Inventory inventory = new Inventory();
+		inventory.addMilk("5");
+		assertEquals(20, inventory.getMilk(), "Milk inventory should add 5 units");
+	}
+
+	// Test getting the initial amount of sugar in the inventory
+	@Test
+	void testGetSugar() {
+		Inventory inventory = new Inventory();
+		assertEquals(15, inventory.getSugar(), "Sugar inventory should begin with 15 units");
+	}
+
+	// Test setting the amount of sugar in the inventory to a specific value
+	@Test
+	void testSetSugar() {
+		Inventory inventory = new Inventory();
+		inventory.setSugar(10);
+		assertEquals(10, inventory.getSugar(), "Sugar inventory should set 10 units");
+	}
+
+	// Test adding sugar to the inventory and checking if the inventory is updated
+	// correctly
+	@Test
+	void testAddSugar() throws InventoryException {
+		Inventory inventory = new Inventory();
+		inventory.addSugar("5");
+		assertEquals(20, inventory.getSugar(), "Sugar inventory should add 5 units");
+	}
+
+	@Test
+	void testEnoughIngredients() throws RecipeException {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+
+		// Create a new recipe with specific amounts of ingredients
+		Recipe recipe = new Recipe();
+		recipe.setAmtCoffee("2");
+		recipe.setAmtMilk("3");
+		recipe.setAmtSugar("1");
+		recipe.setAmtChocolate("0");
+
+		// Verify that there are enough ingredients to make the recipe
+		boolean enoughIngredients = inventory.enoughIngredients(recipe);
+		assertTrue(enoughIngredients, "There should be enough ingredients for the recipe");
+	}
+
+	@Test
+	void testUseIngredients() throws RecipeException {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+
+		// Create a new recipe with specific amounts of ingredients
+		Recipe recipe = new Recipe();
+		recipe.setAmtCoffee("5");
+		recipe.setAmtMilk("5");
+		recipe.setAmtSugar("5");
+		recipe.setAmtChocolate("5");
+
+		// Use the ingredients to make the recipe
+		boolean enoughIngredients = inventory.useIngredients(recipe);
+		assertTrue(enoughIngredients, "There should be enough ingredients to make the recipe");
+
+		// Verify that the inventory is updated correctly
+		assertEquals(10, inventory.getCoffee(), "Coffee inventory should decrease by 5 units");
+		assertEquals(10, inventory.getMilk(), "Milk inventory should decrease by 5 units");
+		assertEquals(10, inventory.getSugar(), "Sugar inventory should decrease by 5 units");
+		assertEquals(10, inventory.getChocolate(), "Chocolate inventory should decrease by 5 units");
+	}
+
+	@Test
+	void testToString() {
+		// Create a new instance of the Inventory class
+		Inventory inventory = new Inventory();
+
+		// Set the values of each ingredient to a specific amount
+		inventory.setCoffee(8);
+		inventory.setMilk(12);
+		inventory.setSugar(5);
+		inventory.setChocolate(3);
+
+		// Verify that the expected string is returned by the toString() method
+		String expectedString = "Coffee units: 8\nMilk units: 12\nSugar units: 5\nChocolate units: 3\n";
+		assertEquals(expectedString, inventory.toString(),
+				"The toString() method should return a string representation of the inventory");
+	}
+}
+
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * 
+ * This class contains JUnit test cases for the RecipeBook class.
+ */
+class RecipeBookTest {
+
+	private RecipeBook book;
+	private Recipe recipe1;
+	private Recipe recipe2;
+	private Recipe recipe3;
+	private Recipe recipe4;
+
+	@BeforeEach
+	void setUp() {
+// Initialize test objects
+		book = new RecipeBook();
+		recipe1 = new Recipe();
+		recipe1.setName("Espresso");
+		recipe2 = new Recipe();
+		recipe2.setName("Latte");
+		recipe3 = new Recipe();
+		recipe3.setName("Mocha");
+		recipe4 = new Recipe();
+		recipe4.setName("Cappuccino");
+	}
+
+	@Test
+	void testGetRecipes() {
+
+// Test if getting recipes returns an array of 4 recipes
+		Recipe[] recipes = book.getRecipes();
+		assertNotNull(recipes, "Failed to return an array of recipes");
+		assertEquals(4, recipes.length, "Incorrect number of recipes returned");
+	}
+
+	@Test
+	void testAddRecipe() {
+
+// Test adding new recipes to the book
+		assertTrue(book.addRecipe(recipe1), "Failed to add recipe1 to the book");
+		assertTrue(book.addRecipe(recipe2), "Failed to add recipe2 to the book");
+		assertFalse(book.addRecipe(recipe2), "Adding a recipe that already exists should return false");
+		assertTrue(book.addRecipe(recipe3), "Failed to add recipe3 to the book");
+		assertTrue(book.addRecipe(recipe4), "Failed to add recipe4 to the book");
+		assertFalse(book.addRecipe(new Recipe()), "Adding a recipe to a full book should return false");
+	}
+
+	@Test
+	void testDeleteRecipe() {
+
+// Test deleting recipes from the book
+		assertNull(book.deleteRecipe(0), "Deleting a recipe at an empty index should return null");
+		book.addRecipe(recipe1);
+		book.addRecipe(recipe2);
+		String deletedRecipeName = book.deleteRecipe(1);
+		assertEquals("Latte", deletedRecipeName, "Incorrect recipe name returned after deleting a recipe");
+		Recipe[] recipes = book.getRecipes();
+		assertEquals(4, recipes.length, "Deleting a recipe should not change the number of recipes in the book");
+		assertNull(recipes[1], "Deleting a recipe should set its index to null");
+	}
+
+	@Test
+	void testEditRecipe() {
+
+// Test editing recipes in the book
+		assertNull(book.editRecipe(0, recipe1), "Editing a recipe at an empty index should return null");
+		book.addRecipe(recipe1);
+		book.addRecipe(recipe2);
+		String editedRecipeName = book.editRecipe(1, recipe3);
+		assertEquals("Latte", editedRecipeName, "Incorrect recipe name returned after editing a recipe");
+		Recipe[] recipes = book.getRecipes();
+		assertEquals(4, recipes.length, "Editing a recipe should not change the number of recipes in the book");
+		assertEquals(recipe3, recipes[1], "Editing a recipe should replace it with the new recipe");
+	}
+
+}
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+class RecipeExceptionTest {
+
+	@Test
+	void testRecipeException() {
+		// Create a new RecipeException with a test message and assert that the correct
+		// message is returned
+		String message = "Test message";
+		RecipeException e = assertThrows(RecipeException.class, () -> {
+			throw new RecipeException(message);
+		});
+		assertEquals(message, e.getMessage());
+	}
+
+	@Test
+	void testRecipeExceptionWithMessage() {
+		// Create a new RecipeException with a different test message and assert that
+		// the correct message is returned
+		String message = "Another test message";
+		RecipeException e = assertThrows(RecipeException.class, () -> {
+			throw new RecipeException(message);
+		});
+		assertEquals(message, e.getMessage());
+	}
+
+}
+
+/*Student Name: Cynthia Maroupas Student ID: 261119382*/
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+//This class contains unit tests for the Recipe class
+class RecipeTest {
+
+	// This test verifies that the getAmtChocolate() method returns the correct
+	// value
+	@Test
+	void testGetAmtChocolate() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtChocolate("2");
+		assertEquals(2, recipe.getAmtChocolate());
+	}
+
+	// This test verifies that the setAmtChocolate() method sets the correct value
+	// and throws a RecipeException if the input is invalid
+	@Test
+	void testSetAmtChocolate() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtChocolate("3");
+		assertEquals(3, recipe.getAmtChocolate());
+		assertThrows(RecipeException.class, () -> recipe.setAmtChocolate("-1"));
+		assertThrows(RecipeException.class, () -> recipe.setAmtChocolate("abc"));
+	}
+
+	// This test verifies that the getAmtCoffee() method returns the correct value
+	@Test
+	void testGetAmtCoffee() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtCoffee("2");
+		assertEquals(2, recipe.getAmtCoffee());
+	}
+
+	// This test verifies that the setAmtCoffee() method sets the correct value
+	// and throws a RecipeException if the input is invalid
+	@Test
+	void testSetAmtCoffee() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtCoffee("3");
+		assertEquals(3, recipe.getAmtCoffee());
+		assertThrows(RecipeException.class, () -> recipe.setAmtCoffee("-1"));
+		assertThrows(RecipeException.class, () -> recipe.setAmtCoffee("abc"));
+	}
+
+	// This test verifies that the getAmtMilk() method returns the correct value
+	@Test
+	void testGetAmtMilk() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtMilk("2");
+		assertEquals(2, recipe.getAmtMilk());
+	}
+
+	// This test verifies that the setAmtMilk() method sets the correct value
+	// and throws a RecipeException if the input is invalid
+	@Test
+	void testSetAmtMilk() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtMilk("3");
+		assertEquals(3, recipe.getAmtMilk());
+		assertThrows(RecipeException.class, () -> recipe.setAmtMilk("-1"));
+		assertThrows(RecipeException.class, () -> recipe.setAmtMilk("abc"));
+	}
+
+	// This test verifies that the getAmtSugar() method returns the correct value
+	@Test
+	void testGetAmtSugar() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtSugar("2");
+		assertEquals(2, recipe.getAmtSugar());
+	}
+
+	// This test verifies that the setAmtSugar() method sets the correct value
+	// and throws a RecipeException if the input is invalid
+	@Test
+	void testSetAmtSugar() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setAmtSugar("3");
+		assertEquals(3, recipe.getAmtSugar());
+		assertThrows(RecipeException.class, () -> recipe.setAmtSugar("-1"));
+		assertThrows(RecipeException.class, () -> recipe.setAmtSugar("abc"));
+	}
+
+	// This test verifies that the getName() method returns the correct value
+	@Test
+	void testGetName() {
+		Recipe recipe = new Recipe();
+		recipe.setName("Latte");
+		assertEquals("Latte", recipe.getName());
+	}
+
+	// Test the setName() method
+	@Test
+	void testSetName() {
+		Recipe recipe = new Recipe();
+		recipe.setName("Mocha");
+		assertEquals("Mocha", recipe.getName());
+	}
+
+	// Test the getPrice() method
+	@Test
+	void testGetPrice() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setPrice("2");
+		assertEquals(2, recipe.getPrice());
+	}
+
+	// Test the setPrice() method
+	@Test
+	void testSetPrice() throws RecipeException {
+		Recipe recipe = new Recipe();
+		recipe.setPrice("3");
+		assertEquals(3, recipe.getPrice());
+		assertThrows(RecipeException.class, () -> recipe.setPrice("-1"));
+		assertThrows(RecipeException.class, () -> recipe.setPrice("abc"));
+	}
+
+	@Test
+	void testToString() {
+		// Create a new instance of the Recipe class
+		Recipe recipe = new Recipe();
+
+		// Set the name of the recipe
+		recipe.setName("Cappuccino");
+
+		// Verify that the expected string is returned by the toString() method
+		assertEquals("Cappuccino", recipe.toString());
+	}
+
+	// creating two instances of the Recipe class with the same name, and verify
+	// that they have the same hash code
+	@Test
+	void testHashCode() {
+		Recipe recipe1 = new Recipe();
+		Recipe recipe2 = new Recipe();
+		recipe1.setName("Latte");
+		recipe2.setName("Latte");
+		assertEquals(recipe1.hashCode(), recipe2.hashCode());
+	}
+
+	// creating two instances of the Recipe class with the same name, and verify
+	// that the equals method returns true when comparing them
+	@Test
+	void testEquals() {
+		Recipe recipe1 = new Recipe();
+		Recipe recipe2 = new Recipe();
+		recipe1.setName("Latte");
+		recipe2.setName("Latte");
+		assertTrue(recipe1.equals(recipe2));
+	}
+}
